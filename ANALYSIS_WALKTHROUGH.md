@@ -1,18 +1,27 @@
 # Analysis walkthrough
 
-## Questions
-1. What share of eligible demo loans are labeled default?
-2. How do rates vary across grade, term, purpose and DTI band?
-3. Does a leakage-aware baseline discriminate simulated outcomes on a holdout?
+## Questions answered
+1. What is the eligible loan volume and observed default rate?
+2. How do rates differ by grade, income band, DTI band, term and purpose?
+3. What is the volume and default rate for grades D/E when DTI exceeds 25%?
+4. Does a simple model outperform a prior-only baseline on a later period?
+5. Are missingness, duplicates, target labels and numeric ranges safe enough for exploratory analysis?
 
-## Reproduce
-Run `python -m src.analyze --input data/sample/synthetic_loans.csv --output outputs`. The script writes metrics JSON and segment CSVs.
+## Run the analysis
 
-## Read the metrics responsibly
-- `default_rate_pct`: simulated defaults divided by all simulated loans in the group.
-- `ROC-AUC`: ranking discrimination on the held-out set; it is not calibration and does not define an operating threshold.
-- `precision_default`: of loans predicted default at threshold 0.5, share that are actually labeled default.
-- `recall_default`: of loans labeled default, share detected at threshold 0.5.
-- `F1`: harmonic mean of precision and recall.
+```bash
+python -m src.validate_data --input data/sample/synthetic_loans.csv --output outputs/data_quality.json
+python -m src.analyze --input data/sample/synthetic_loans.csv --output outputs
+```
 
-These are demo outputs only. Do not paste their values into a resume as real business findings. For real historical data, use an out-of-time evaluation and assess calibration, stability, and subgroup performance.
+The `outputs/` folder contains segment tables, metrics, target-segment calculation and test-set predictions. Outputs are reproducible for a fixed input and library versions. The default bundled run is explicitly a synthetic demonstration.
+
+## How to discuss this project in an interview
+
+- Explain how unresolved loan statuses are excluded to reduce outcome-label ambiguity.
+- Explain why post-origination payment and recovery columns would be leakage if used to predict an origination-time outcome.
+- Describe the difference between a segment default rate and an individual model score.
+- Explain why segment denominators and confidence intervals matter.
+- Compare logistic regression to the prior-only baseline and interpret PR-AUC alongside ROC-AUC.
+- Explain why the validation set—not the final test set—selects the illustrative threshold.
+- State that synthetic data validates code paths, not real-world business findings.

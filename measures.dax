@@ -1,0 +1,41 @@
+-- Create a table named Measures in Power BI, then add each measure below.
+-- Base table: FactLoans (output of src/prepare_lendingclub.py)
+
+Total Loans = DISTINCTCOUNT(FactLoans[loan_id])
+
+Default Loans = CALCULATE([Total Loans], FactLoans[default_flag] = 1)
+
+Default Rate = DIVIDE([Default Loans], [Total Loans])
+
+Total Original Loan Amount = SUM(FactLoans[loan_amnt])
+
+Defaulted Original Loan Amount = CALCULATE([Total Original Loan Amount], FactLoans[default_flag] = 1)
+
+Average Loan Amount = AVERAGE(FactLoans[loan_amnt])
+
+Average Interest Rate = DIVIDE(AVERAGE(FactLoans[int_rate]), 100)
+
+Average DTI = DIVIDE(AVERAGE(FactLoans[dti]), 100)
+
+Average Annual Income = AVERAGE(FactLoans[annual_inc])
+
+Loans in D/E and DTI >25% =
+CALCULATE(
+    [Total Loans],
+    KEEPFILTERS(FactLoans[grade] IN {"D", "E"}),
+    KEEPFILTERS(FactLoans[dti] > 25)
+)
+
+Defaults in D/E and DTI >25% =
+CALCULATE(
+    [Default Loans],
+    KEEPFILTERS(FactLoans[grade] IN {"D", "E"}),
+    KEEPFILTERS(FactLoans[dti] > 25)
+)
+
+Default Rate | D/E and DTI >25% =
+DIVIDE([Defaults in D/E and DTI >25%], [Loans in D/E and DTI >25%])
+
+-- Suggested formatting:
+-- Default Rate, Average Interest Rate, Average DTI, Default Rate | D/E... -> Percentage, 1 decimal
+-- Monetary measures -> Currency with 0 decimals; counts -> Whole number
