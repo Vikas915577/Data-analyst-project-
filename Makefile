@@ -1,4 +1,4 @@
-.PHONY: setup test validate analyze dashboard report
+.PHONY: setup test validate analyze dashboard report preview
 
 setup:
 	python -m pip install -r requirements.txt
@@ -10,10 +10,13 @@ validate:
 	python -m src.validate_data --input data/sample/synthetic_loans.csv --output outputs/data_quality.json
 
 analyze:
-	python -m src.analyze --input data/sample/synthetic_loans.csv --output outputs
+	python -m src.analyze --input data/sample/synthetic_loans.csv --output outputs/analysis
 
 dashboard:
-	streamlit run app/streamlit_app.py
+	streamlit run streamlit_app.py
 
 report:
 	python -m src.create_demo_report
+
+preview:
+	python -m src.create_preview

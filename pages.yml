@@ -1,18 +1,24 @@
-name: Publish static portfolio preview
+name: Deploy portfolio site to GitHub Pages
+
 on:
   push:
     branches: [main, master]
     paths:
-      - 'reports/demo_analysis.html'
+      - 'index.html'
+      - 'reports/**'
+      - 'excel/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: github-pages
   cancel-in-progress: true
+
 jobs:
   deploy:
     environment:
@@ -22,11 +28,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Prepare static report site
+      - name: Prepare static portfolio site
         run: |
-          mkdir -p site
-          cp reports/demo_analysis.html site/index.html
-          cp reports/dashboard_preview.png site/dashboard_preview.png
+          mkdir -p site/reports site/downloads
+          cp index.html site/index.html
+          cp reports/demo_analysis.html site/reports/demo_analysis.html
+          cp reports/dashboard_preview.png site/reports/dashboard_preview.png
+          cp excel/Credit_Risk_Analytics.xlsx site/downloads/Credit_Risk_Analytics.xlsx
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
